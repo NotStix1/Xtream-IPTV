@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="aurora">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Player</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <style>
+    body { margin:0; background: var(--bg); color: var(--text); }
+    .stage { padding: 16px; }
+    .player-card { margin: 16px; padding: 12px; }
+  </style>
+  <script>
+    // Minimal boot to attach token to internal endpoints
+    document.addEventListener('DOMContentLoaded', () => {
+      const video = document.getElementById('video-player');
+      const titleEl = document.getElementById('player-title');
+      const params = new URLSearchParams(window.location.search);
+      const title = params.get('title') || '';
+      const url = params.get('url') || '';
+      titleEl.textContent = title;
+      if (url) {
+        video.controls = false;
+        video.src = url;
+        video.autoplay = true;
+        video.load();
+      }
+    });
+  </script>
+</head>
+<body>
+  <div class="stage">
+    <div class="player card player-card" id="player-section" style="position:static">
+      <div class="player-top">
+        <div id="player-title" class="title"></div>
+        <button id="player-close" class="icon-btn" onclick="window.close()" title="Close">✕</button>
+      </div>
+      <video id="video-player" playsinline></video>
+      <div class="custom-controls" id="custom-controls">
+        <button id="ctrl-play" class="cbtn accent" aria-label="Play/Pause">▶</button>
+        <button id="ctrl-rew" class="cbtn" aria-label="Rewind 10 seconds">↺ 10s</button>
+        <button id="ctrl-fwd" class="cbtn" aria-label="Forward 10 seconds">10s ↻</button>
+        <div class="spacer"></div>
+        <button id="ctrl-mute" class="cbtn" aria-label="Mute/Unmute">🔊</button>
+        <input id="ctrl-volume" class="cslider" type="range" min="0" max="1" step="0.01" value="1" aria-label="Volume" />
+        <button id="ctrl-fs" class="cbtn" aria-label="Fullscreen toggle">⛶</button>
+      </div>
+    </div>
+  </div>
+  <script src="/static/js/player.js"></script>
+</body>
+</html>
+
+
+

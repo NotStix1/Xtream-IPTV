@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="aurora">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IPTV – Sign in</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body class="login-body">
+  <div class="auth-panel card">
+    <div class="auth-toggle">
+      <button id="show-login" class="tab active">Login</button>
+      <button id="show-register" class="tab">Register</button>
+    </div>
+    <div id="login-form">
+      <div class="field"><input id="login-email" type="email" class="input" placeholder="Email" /></div>
+      <div class="field"><input id="login-password" type="password" class="input" placeholder="Password" /></div>
+      <div id="login-error" class="error"></div>
+      <button id="login-btn" class="button full">Login</button>
+    </div>
+    <div id="register-form" style="display:none;">
+      <div class="field"><input id="register-email" type="email" class="input" placeholder="Email" /></div>
+      <div class="field"><input id="register-password" type="password" class="input" placeholder="Password" /></div>
+      <div id="register-error" class="error"></div>
+      <button id="register-btn" class="button full">Create account</button>
+    </div>
+  </div>
+  <script src="/static/js/index.js"></script>
+</body>
+</html>

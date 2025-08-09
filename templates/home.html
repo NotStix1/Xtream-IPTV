@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="aurora">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IPTV – Home</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <div id="boot-overlay" class="boot-screen">
+    <div class="boot-box">
+      <div class="logo" style="font-size:28px; text-align:center; margin-bottom:8px;">View<span>It</span></div>
+      <div class="progress" style="height:8px; border-radius:999px; overflow:hidden;"><span id="boot-progress" style="width:0%"></span></div>
+      <div id="boot-text" class="muted" style="text-align:center; margin-top:8px">Preparing content…</div>
+    </div>
+  </div>
+
+  <div class="app">
+    <aside class="sidebar">
+      <div class="logo">View<span>It</span></div>
+      <nav class="nav">
+        <button class="item" data-section="search">Search</button>
+        <button class="item" data-section="live">Live TV</button>
+        <button class="item active" data-section="movies">Movies</button>
+        <button class="item" data-section="series">Series</button>
+        <div class="sep"></div>
+        <button class="item" id="settings-btn">Settings</button>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="banner card subtle">
+          <strong>Heads up:</strong> Enter your IPTV credentials to unlock content.
+        </div>
+        <div class="right">
+          <select id="profile-select" class="select"></select>
+          <button id="profiles-btn" class="button ghost">Profiles</button>
+          <button id="logout-btn" class="button danger ghost">Logout</button>
+        </div>
+      </header>
+
+      <!-- Search / IPTV credentials -->
+      <section id="search" class="page">
+        <div id="iptv-credentials-form" class="card padded">
+          <h2>IPTV Login</h2>
+          <div class="grid grid-3">
+            <input id="server-url" class="input" placeholder="Server URL (http://example.com:80)" />
+            <input id="iptv-username" class="input" placeholder="Username" />
+            <input id="iptv-password" type="password" class="input" placeholder="Password" />
+          </div>
+          <div id="iptv-error" class="error"></div>
+          <button id="save-iptv-btn" class="button">Save</button>
+        </div>
+
+        <div class="card padded" style="margin-top:12px">
+          <h2 class="section-title">Search</h2>
+          <div class="inline-form">
+            <input id="search-input" class="input" placeholder="Search movies, series, or live channels" />
+            <button id="search-btn" class="button">Search</button>
+          </div>
+          <div id="search-type" class="chips" style="margin-top:10px">
+            <div class="chip active" data-type="all">All</div>
+            <div class="chip" data-type="vod">Movies</div>
+            <div class="chip" data-type="series">Series</div>
+            <div class="chip" data-type="live">Live TV</div>
+          </div>
+        </div>
+
+        <div id="search-results" class="rows" style="margin-top:12px"></div>
+      </section>
+
+      <!-- Live -->
+      <section id="live" class="page">
+        <h2 class="section-title">Live TV</h2>
+        <div id="live-rows" class="rows"></div>
+        <div id="live-all" style="display:none">
+          <button id="live-back" class="button ghost" style="margin-bottom:10px">Back</button>
+          <h2 id="live-all-title" class="section-title"></h2>
+          <div id="live-all-streams" class="cards-row"></div>
+        </div>
+      </section>
+
+      <!-- Movies -->
+      <section id="movies" class="page show">
+        <h2 class="section-title">Movies</h2>
+        <div id="movies-rows" class="rows"></div>
+        <div id="movies-all" style="display:none">
+          <button id="movies-back" class="button ghost" style="margin-bottom:10px">Back</button>
+          <h2 id="movies-all-title" class="section-title"></h2>
+          <div id="movies-all-streams" class="cards-row"></div>
+        </div>
+      </section>
+
+      <!-- Series -->
+      <section id="series" class="page">
+        <h2 class="section-title">Series</h2>
+        <div id="series-rows" class="rows"></div>
+        <div id="series-all" style="display:none">
+          <button id="series-back" class="button ghost" style="margin-bottom:10px">Back</button>
+          <h2 id="series-all-title" class="section-title"></h2>
+          <div id="series-all-streams" class="cards-row"></div>
+        </div>
+      </section>
+
+      <!-- Profiles -->
+      <section id="profiles-section" class="page">
+        <h2>Profiles</h2>
+        <div id="profiles-list" class="cards-row"></div>
+        <div class="inline-form">
+          <input type="text" id="new-profile-name" class="input" placeholder="Profile name" />
+          <button id="create-profile-btn" class="button">Create</button>
+        </div>
+      </section>
+
+      <!-- Global player -->
+      <div id="player-section" class="player card hidden">
+        <div class="player-top">
+          <div class="player-top-left">
+            <button id="ctrl-back" class="icon-btn" title="Back">←</button>
+            <div id="player-title" class="title"></div>
+          </div>
+          <button id="player-close" class="icon-btn" title="Close">✕</button>
+        </div>
+        <div class="side-volume">
+          <div class="vstack">
+            <button id="ctrl-mute" class="cbtn" aria-label="Mute/Unmute">🔊</button>
+            <input id="ctrl-volume" class="vslider" type="range" min="0" max="1" step="0.01" value="1" aria-label="Volume" />
+            <input id="ctrl-boost" class="vslider" type="range" min="1" max="3" step="0.1" value="1" aria-label="Audio Boost" />
+          </div>
+        </div>
+        <div class="center-controls">
+          <button id="ctrl-center-rew" class="center-skip" aria-label="Rewind 10 seconds">↺ 10s</button>
+          <button id="ctrl-center" class="center-toggle" aria-label="Play/Pause">▶</button>
+          <button id="ctrl-center-fwd" class="center-skip" aria-label="Forward 10 seconds">10s ↻</button>
+        </div>
+          <video id="video-player" playsinline preload="metadata"></video>
+         <div class="custom-controls" id="custom-controls">
+           <div class="spacer"></div>
+           <input id="ctrl-progress" class="cprogress" type="range" min="0" max="1000" step="1" value="0" aria-label="Seek" />
+           <span id="ctrl-time" class="ctime" aria-hidden="true">00:00 / 00:00</span>
+           <div class="spacer"></div>
+         </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- About modal -->
+  <div id="about-overlay" class="overlay hidden">
+    <div class="about card">
+      <div class="about-media">
+        <img id="about-cover" alt="cover"/>
+      </div>
+      <div class="about-body">
+        <div class="about-header">
+          <h3 id="about-title"></h3>
+          <div class="about-meta"><span id="about-quality"></span><span id="about-year"></span></div>
+        </div>
+        <p id="about-overview" class="about-overview"></p>
+        <div id="about-actions" class="about-actions">
+          <button id="about-play" class="button">Play</button>
+          <button id="about-add" class="button ghost">Add to My List</button>
+        </div>
+        <div id="about-series" class="hidden">
+          <div id="season-chips" class="chips"></div>
+          <div id="episodes-grid" class="episodes"></div>
+        </div>
+        <button id="about-close" class="icon-btn close">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings modal -->
+  <div id="settings-overlay" class="overlay hidden">
+    <div class="settings card padded">
+        <h3>Settings</h3>
+      <div class="setting">
+        <label>Theme</label>
+        <select id="theme-select" class="select">
+          <option value="aurora" selected>Aurora Teal</option>
+          <option value="classic">Classic</option>
+        </select>
+      </div>
+      <div class="actions">
+        <button id="settings-close" class="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script src="/static/js/home.js"></script>
+</body>
+</html>

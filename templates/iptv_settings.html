@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="aurora">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IPTV Settings</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <style>
+    .page-wrap{max-width:min(900px,92vw);margin:24px auto;display:flex;flex-direction:column;gap:16px}
+    .topbar{display:flex;justify-content:space-between;align-items:center}
+  </style>
+  </head>
+<body>
+  <div class="page-wrap">
+    <div class="topbar">
+      <div class="logo">View<span>It</span></div>
+      <div>
+        <a class="button ghost" href="/home">Back to Home</a>
+      </div>
+    </div>
+
+    <div class="card padded">
+      <h2 class="section-title">IPTV Settings</h2>
+      <p class="muted">Update your IPTV server details below.</p>
+      <div class="grid grid-3" style="margin-top:10px">
+        <input id="iptv-set-server" class="input" placeholder="Server URL (http://example.com:80)" />
+        <input id="iptv-set-username" class="input" placeholder="Username" />
+        <input id="iptv-set-password" type="password" class="input" placeholder="Password" />
+      </div>
+      <div id="iptv-set-error" class="error" style="min-height:20px"></div>
+      <div style="display:flex;gap:10px;align-items:center;margin-top:10px">
+        <button id="iptv-set-save" class="button">Save</button>
+        <button id="iptv-set-refresh" class="button ghost">Refresh Connection</button>
+        <span id="iptv-set-status" class="muted"></span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    const token = localStorage.getItem('token');
+    if (!token) { window.location.href = '/'; return; }
+    const authFetch = (url, opts={}) => { opts.headers = opts.headers||{}; opts.headers['Authorization']='Bearer '+token; return fetch(url, opts); };
+
+    const server = document.getElementById('iptv-set-server');
+    const user = document.getElementById('iptv-set-username');
+    const pass = document.getElementById('iptv-set-password');
+    const save = document.getElementById('iptv-set-save');
+    const refresh = document.getElementById('iptv-set-refresh');
+    const errorEl = document.getElementById('iptv-set-error');
+    const statusEl = document.getElementById('iptv-set-status');
+
+    async function loadCreds(){
+      try{ const res = await authFetch('/iptv/credentials'); const data = await res.json(); if(res.ok){ server.value=data.server_url||''; user.value=data.username||''; pass.value=''; } }catch{}
+    }
+    async function saveCreds(){
+      errorEl.textContent=''; statusEl.textContent='';
+      const server_url=(server.value||'').trim(), username=(user.value||'').trim(), password=(pass.value||'').trim();
+      if(!server_url||!username||!password){ errorEl.textContent='All IPTV fields are required.'; return; }
+      try{ const res=await authFetch('/iptv/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({server_url,username,password})}); const data=await res.json(); if(res.ok){ statusEl.textContent='Saved.'; } else { errorEl.textContent=data.error||'Failed to save IPTV credentials.'; } }catch{ errorEl.textContent='Network error.'; }
+    }
+    async function refreshConn(){
+      errorEl.textContent=''; statusEl.textContent='Refreshing…';
+      try{ const res=await authFetch('/iptv/refresh',{method:'POST'}); const data=await res.json(); if(res.ok){ statusEl.textContent=data.ok?'Connection OK':'Connection failed'; } else { errorEl.textContent=data.error||'Refresh failed'; statusEl.textContent=''; } }catch{ errorEl.textContent='Network error.'; statusEl.textContent=''; }
+    }
+
+    save.addEventListener('click', saveCreds);
+    refresh.addEventListener('click', refreshConn);
+    loadCreds();
+  })();
+  </script>
+</body>
+</html>
+
+
+
